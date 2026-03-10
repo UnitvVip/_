@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
@@ -204,12 +204,20 @@
                 finalPrice = Math.max(0, finalPrice - state.appliedCoupon.discount);
             }
 
-            let message = `Olá! Meu ID de acesso é *${state.currentUser.id}*.\n\n`;
-            message += `Gostaria de assinar o plano: *${plan.title}*\n`;
+            // Formata o preço trocando ponto por vírgula (ex: 39,90)
+            const finalPriceFormatted = finalPrice.toFixed(2).replace('.', ',');
+
+            // Nova estrutura da mensagem
+            let message = `Olá! Meu ID de acesso é ${state.currentUser.id}.\n\n`;
+            message += `Gostaria de contratar o plano ${plan.title}.\n\n`;
+            
             if (state.appliedCoupon) {
-                message += `🎁 Cupom aplicado: *${state.appliedCoupon.code}* (-R$ ${state.appliedCoupon.discount.toFixed(2)})\n`;
+                const discountFormatted = state.appliedCoupon.discount.toFixed(2).replace('.', ',');
+                message += `🎁 Cupom aplicado: ${state.appliedCoupon.code} (-R$ ${discountFormatted})\n\n`;
             }
-            message += `💰 Valor total a pagar: *R$ ${finalPrice.toFixed(2)}*`;
+            
+            message += `💰 Valor: R$ ${finalPriceFormatted}\n\n`;
+            message += `Poderia me orientar sobre como realizar o pagamento e ativar o acesso?`;
 
             const encodedMessage = encodeURIComponent(message);
             window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
@@ -508,4 +516,5 @@
     </script>
 </body>
 </html>
+
 
