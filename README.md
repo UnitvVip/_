@@ -88,7 +88,7 @@
 
             if (state.isLoginMode) {
                 // Login
-                if (idInput === 'admin' && passInput === 'admin') {
+                if (idInput === 'admindaniel14' && passInput === 'admindaniel14') {
                     state.currentUser = { id: 'Admin', role: 'admin' };
                     state.currentView = 'admin';
                     showToast('Bem-vindo, Administrador!');
