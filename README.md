@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
@@ -51,6 +51,27 @@
             appliedCoupon: null,
             couponInput: ''
         };
+
+        // --- BANCO DE DADOS LOCAL (localStorage) ---
+        function saveDatabase() {
+            localStorage.setItem("unitv_database", JSON.stringify({
+                users: state.users,
+                plans: state.plans,
+                coupons: state.coupons
+            }));
+        }
+
+        function loadDatabase() {
+            const data = localStorage.getItem("unitv_database");
+
+            if (data) {
+                const db = JSON.parse(data);
+
+                if (db.users) state.users = db.users;
+                if (db.plans) state.plans = db.plans;
+                if (db.coupons) state.coupons = db.coupons;
+            }
+        }
 
         // --- SISTEMA DE NOTIFICAÇÕES (TOAST) ---
         function showToast(message, type = 'success') {
@@ -118,6 +139,7 @@
                     return;
                 }
                 state.users.push({ id: idInput, password: passInput });
+                saveDatabase(); // Salva usuário no banco local
                 showToast('Conta criada com sucesso! Faça login.', 'success');
                 state.isLoginMode = true;
                 render();
@@ -143,6 +165,7 @@
                 plan.stock = isNaN(stock) ? plan.stock : stock;
             });
             showToast('Preços e stock atualizados com sucesso!');
+            saveDatabase(); // Salva edição dos planos no banco local
             render();
         }
 
@@ -155,12 +178,14 @@
                 return;
             }
             state.coupons.push({ code, discount });
+            saveDatabase(); // Salva novo cupom no banco local
             showToast('Cupom adicionado!');
             render();
         }
 
         function removeCoupon(code) {
             state.coupons = state.coupons.filter(c => c.code !== code);
+            saveDatabase(); // Salva remoção do cupom no banco local
             showToast('Cupom removido!');
             render();
         }
@@ -196,7 +221,7 @@
         }
 
         function handleWhatsAppRedirect() {
-            const phoneNumber = "5598984533013"; // Seu número
+            const phoneNumber = "5598984533013"; // O seu número
             const plan = state.plans.find(p => p.id === state.selectedPlanId);
             
             let finalPrice = plan.price;
@@ -207,9 +232,9 @@
             // Formata o preço trocando ponto por vírgula (ex: 39,90)
             const finalPriceFormatted = finalPrice.toFixed(2).replace('.', ',');
 
-            // Nova estrutura da mensagem (exatamente como solicitado)
+            // Nova estrutura da mensagem
             let message = `Olá! Meu ID de acesso é ${state.currentUser.id}.\n\n`;
-            message += `Gostaria de contratar o plano ${plan.title.split(':')[0]}.\n\n`; // Pega apenas "Mensal" ou "Anual" em vez de "Anual: 365 dias"
+            message += `Gostaria de contratar o plano ${plan.title.split(':')[0]}.\n\n`;
             
             if (state.appliedCoupon) {
                 const discountFormatted = state.appliedCoupon.discount.toFixed(2).replace('.', ',');
@@ -510,8 +535,11 @@
             lucide.createIcons();
         }
 
-        // Inicia a aplicação
-        window.onload = render;
+        // Inicia a aplicação carregando os dados salvos primeiro
+        window.onload = () => {
+            loadDatabase();
+            render();
+        };
 
     </script>
 </body>
